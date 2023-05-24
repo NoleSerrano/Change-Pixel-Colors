@@ -286,6 +286,7 @@ public class ChangePixelColorsGUI extends JFrame {
 				selectedColor = updatedColor;
 				// Update the selection panel with the selected color
 				updateSelectionPanel(updatedColor);
+				updatePixelColors();
 			}
 		};
 		model.addChangeListener(changeListener);
@@ -371,7 +372,7 @@ public class ChangePixelColorsGUI extends JFrame {
 		}
 
 //		displayPixelImage(currentImage);
-		
+
 	}
 
 	private static void displayPixelImage(BufferedImage image) {
@@ -421,7 +422,26 @@ public class ChangePixelColorsGUI extends JFrame {
 		label.setIcon(new ImageIcon(newScaledImage));
 		pixelImageFrame.pack();
 	}
-	
+
+	private static void updatePixelColors() {
+		int width = currentImage.getWidth();
+		int height = currentImage.getHeight();
+		int k = 0;
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				if (colorIndexList.get(k++) == selectedPanelIndex) {
+					int RGB = selectedColor.getRGB();
+					currentImage.setRGB(x, y, RGB);
+				}
+			}
+		}
+		// Update the displayed image
+		Image newScaledImage = currentImage.getScaledInstance(currentImage.getWidth() * pixelImageScalar,
+				currentImage.getHeight() * pixelImageScalar, Image.SCALE_DEFAULT);
+		JLabel label = (JLabel) pixelImageFrame.getContentPane();
+		label.setIcon(new ImageIcon(newScaledImage));
+		pixelImageFrame.pack();
+	}
 
 	public static int getColorIndex(Color color, List<Color> existingColors) {
 		int colorDifferenceThreshold = 5;
