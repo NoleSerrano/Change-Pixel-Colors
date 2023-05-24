@@ -200,17 +200,18 @@ public class ChangePixelColorsGUI extends JFrame {
 			colorCells.add(cell);
 
 			// Add a MouseListener to handle color selection
-			cell.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					selectedColor = color;
-					selectedPanelIndex = colorCells.indexOf(cell);
-					System.out.println("New color selected: " + color + " at selectedPanelIndex " + selectedPanelIndex);
-
-					// Update the first image with the selected color
-					// Code for updating the image goes here...
-				}
-			});
+//			cell.addMouseListener(new MouseAdapter() {
+//				@Override
+//				public void mouseClicked(MouseEvent e) {
+//					selectedColor = color;
+//					selectedPanelIndex = colorCells.indexOf(cell);
+//					currentSelectedPanelCell = cell;
+//					System.out.println("New color selected: " + color + " at selectedPanelIndex " + selectedPanelIndex);
+//
+//					// Update the first image with the selected color
+//					// Code for updating the image goes here...
+//				}
+//			});
 
 			colorPanel.add(cell);
 		}
@@ -295,97 +296,6 @@ public class ChangePixelColorsGUI extends JFrame {
 
 		frame.pack();
 		frame.setVisible(true);
-	}
-
-	private static JPanel createAdjustmentPanel() {
-		JPanel adjustmentPanel = new JPanel();
-		adjustmentPanel.setLayout(new BoxLayout(adjustmentPanel, BoxLayout.Y_AXIS));
-
-		// Create the hue slider
-		JSlider hueSlider = new JSlider(JSlider.HORIZONTAL, 0, 360, 0);
-		hueSlider.setMajorTickSpacing(60);
-		hueSlider.setMinorTickSpacing(10);
-		hueSlider.setPaintTicks(true);
-		hueSlider.setPaintLabels(true);
-		hueSlider.addChangeListener(e -> {
-			// Update the hue value based on the slider position
-			int hueValue = hueSlider.getValue();
-			float[] hsbValues = Color.RGBtoHSB(selectedColor.getRed(), selectedColor.getGreen(),
-					selectedColor.getBlue(), null);
-			Color updatedColor = Color.getHSBColor(hueValue / 360f, hsbValues[1], hsbValues[2]);
-			selectedColor = new Color(updatedColor.getRed(), updatedColor.getGreen(), updatedColor.getBlue(),
-					selectedColor.getAlpha());
-			// Update the selection panel with the selected color
-			updateSelectionPanel(updatedColor);
-		});
-
-		// Add a change listener to the hue slider
-		hueSlider.addChangeListener(e -> {
-			// Get the updated hue value
-			int hue = hueSlider.getValue();
-			// Regenerate the SV boxes with the updated hue value
-			regenerateSVBoxes(hue);
-		});
-
-		// Create the hue line and SV boxes
-		JPanel colorPickerPanel = new JPanel();
-		colorPickerPanel.setLayout(new BorderLayout());
-
-		// Create the hue line
-		JPanel hueLinePanel = new JPanel();
-		hueLinePanel.setLayout(new BoxLayout(hueLinePanel, BoxLayout.X_AXIS));
-		hueLinePanel.setPreferredSize(new Dimension(400, 20));
-		for (int hue = 0; hue <= 360; hue++) {
-			Color hueColor = Color.getHSBColor(hue / 360f, 1, 1);
-			JPanel hueBox = new JPanel();
-			hueBox.setBackground(hueColor);
-			hueBox.setPreferredSize(new Dimension(1, 20));
-			hueBox.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					// Get the selected hue from the position of the mouse click
-					int x = e.getX();
-					int selectedHue = (int) ((x / (double) hueLinePanel.getWidth()) * 360);
-					hueSlider.setValue(selectedHue);
-				}
-			});
-			hueLinePanel.add(hueBox);
-		}
-
-		// Create the SV boxes panel
-		svBoxesPanel = new JPanel();
-		svBoxesPanel.setLayout(new GridLayout(10, 36));
-		svBoxesPanel.setPreferredSize(new Dimension(400, 200));
-		for (int s = 0; s < 10; s++) {
-			for (int v = 0; v < 36; v++) {
-				float saturation = s / 10f;
-				float value = v / 36f;
-				Color svColor = Color.getHSBColor(hueSlider.getValue() / 360f, saturation, value);
-				JPanel svBox = new JPanel();
-				svBox.setBackground(svColor);
-				svBox.addMouseListener(new MouseAdapter() {
-					@Override
-					public void mouseClicked(MouseEvent e) {
-						// Get the selected color from the SV box
-						Color selectedSVColor = svBox.getBackground();
-						selectedColor = new Color(selectedSVColor.getRed(), selectedSVColor.getGreen(),
-								selectedSVColor.getBlue(), selectedColor.getAlpha());
-						// Update the selection panel with the selected color
-						updateSelectionPanel(selectedSVColor);
-					}
-				});
-				svBoxesPanel.add(svBox);
-			}
-		}
-
-		colorPickerPanel.add(hueLinePanel, BorderLayout.NORTH);
-		colorPickerPanel.add(svBoxesPanel, BorderLayout.CENTER);
-
-		// Add components to the adjustment panel
-		adjustmentPanel.add(hueSlider);
-		adjustmentPanel.add(colorPickerPanel);
-
-		return adjustmentPanel;
 	}
 
 	private static void updateSelectionPanel(Color newColor) {
@@ -495,36 +405,6 @@ public class ChangePixelColorsGUI extends JFrame {
 
 		// Set the frame to be visible
 		pixelImageFrame.setVisible(true);
-	}
-
-	// Method to regenerate the SV boxes with the updated hue value
-	private static void regenerateSVBoxes(int hue) {
-		svBoxesPanel.removeAll();
-
-		for (int s = 0; s < 10; s++) {
-			for (int v = 0; v < 36; v++) {
-				float saturation = s / 10f;
-				float value = v / 36f;
-				Color svColor = Color.getHSBColor(hue / 360f, saturation, value);
-				JPanel svBox = new JPanel();
-				svBox.setBackground(svColor);
-				svBox.addMouseListener(new MouseAdapter() {
-					@Override
-					public void mouseClicked(MouseEvent e) {
-						// Get the selected color from the SV box
-						Color selectedSVColor = svBox.getBackground();
-						selectedColor = new Color(selectedSVColor.getRed(), selectedSVColor.getGreen(),
-								selectedSVColor.getBlue(), selectedColor.getAlpha());
-						// Update the selection panel with the selected color
-						updateSelectionPanel(selectedColor);
-					}
-				});
-				svBoxesPanel.add(svBox);
-			}
-		}
-
-		svBoxesPanel.revalidate();
-		svBoxesPanel.repaint();
 	}
 
 	public static int getColorIndex(Color color, List<Color> existingColors) {
