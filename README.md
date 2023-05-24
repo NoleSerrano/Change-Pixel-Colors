@@ -4,8 +4,8 @@ Changes all the pixel colors for a set of images
 ## Parameters
 The following are variables that should be set programmatically:
 * __outputFolderPath__ is the output folder path in the current working directory which by default is set to "output".
-* __baseImageNames__ are the names of the pixel art images you want to change the colors of.
-* __imagePrefixName__ is the string that will be applied to the base image names as a prefix.
+* __inputFolderPath__ is the input folder path in the current working directory which by default is set to "input" and will house the PNG image files you want to modify.
+* __imagePrefixName__ is the an optional string that will be applied to the base image names as a prefix.
 
 ## GUI
 Here is what the GUI will look like (Pretty bad):

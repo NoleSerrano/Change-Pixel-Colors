@@ -54,7 +54,7 @@ public class ChangePixelColorsGUI extends JFrame {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		imagePrefixName = "bb_";
+		imagePrefixName = "";
 		outputFolderPath = "output";
 		inputFolderPath = "input";
 
@@ -68,11 +68,7 @@ public class ChangePixelColorsGUI extends JFrame {
 			System.out.println("Invalid input folder path");
 			return;
 		}
-		if (imagePrefixName.length() == 0) {
-			System.out.println("Image prefix name must not be empty");
-			return;
-		}
-
+		
 		// Retrieve the PNG files from the input folder
 		File[] files = folder.listFiles((dir, name) -> name.endsWith(".png"));
 		if (files == null) {
