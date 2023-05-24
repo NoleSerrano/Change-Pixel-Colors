@@ -37,10 +37,8 @@ public class ChangePixelColorsGUI extends JFrame {
 	private JPanel contentPane;
 	private static List<Color> existingColors = new ArrayList<>();
 	private static JPanel selectionPanel;
-	private static JPanel svBoxesPanel;
 	private static int selectedPanelIndex;
 	private static JPanel currentSelectedPanelCell;
-	private static JPanel colorPanel;
 	private static List<Color> newColorsList = new ArrayList<>();
 	private static List<String> baseImageNames = new ArrayList<>();
 	private static List<Integer> colorIndexList;
@@ -53,7 +51,6 @@ public class ChangePixelColorsGUI extends JFrame {
 	private static String inputFolderPath;
 	private static int screenWidth;
 	private static int screenHeight;
-	private static List<JPanel> colorCells = new ArrayList<>();
 
 	/**
 	 * Launch the application.
@@ -131,15 +128,11 @@ public class ChangePixelColorsGUI extends JFrame {
 		colorSelectionFrame.setLayout(new GridLayout(2, 1));
 
 		// create the panels
-		colorPanel = createColorPanel();
 		selectionPanel = createSelectionPanel();
-		JButton applyChangesButton = createApplyChangesButton();
 		JButton saveChangesButton = createSaveChangesButton();
 
 		// Add the panels to the frame
-		colorSelectionFrame.add(colorPanel);
 		colorSelectionFrame.add(selectionPanel);
-		colorSelectionFrame.add(applyChangesButton);
 		colorSelectionFrame.add(saveChangesButton);
 
 		createColorPicker();
@@ -185,44 +178,6 @@ public class ChangePixelColorsGUI extends JFrame {
 	}
 
 	// PANELS
-
-	private static JPanel createColorPanel() {
-		JPanel colorPanel = new JPanel(new GridLayout(1, existingColors.size()));
-
-		// Create a cell for each color
-		for (int i = 0; i < existingColors.size(); i++) {
-			JPanel cell = new JPanel();
-			Color color = existingColors.get(i);
-			cell.setBackground(color);
-			cell.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-			colorCells.add(cell);
-
-			// Add a MouseListener to handle color selection
-//			cell.addMouseListener(new MouseAdapter() {
-//				@Override
-//				public void mouseClicked(MouseEvent e) {
-//					selectedColor = color;
-//					selectedPanelIndex = colorCells.indexOf(cell);
-//					currentSelectedPanelCell = cell;
-//					System.out.println("New color selected: " + color + " at selectedPanelIndex " + selectedPanelIndex);
-//
-//					// Update the first image with the selected color
-//					// Code for updating the image goes here...
-//				}
-//			});
-
-			colorPanel.add(cell);
-		}
-
-		return colorPanel;
-	}
-
-	private static void updateColorsPanel() {
-		for (int i = 0; i < colorCells.size(); i++) {
-			JPanel colorCell = colorCells.get(i);
-			colorCell.setBackground(newColorsList.get(i));
-		}
-	}
 
 	private static JPanel createSelectionPanel() {
 		JPanel selectionPanel = new JPanel(new GridLayout(1, existingColors.size()));
@@ -302,17 +257,6 @@ public class ChangePixelColorsGUI extends JFrame {
 		;
 	}
 
-	private static JButton createApplyChangesButton() {
-		JButton applyChangesButton = new JButton("Apply Changes");
-		applyChangesButton.addActionListener(e -> {
-			// Apply the selected color changes to the first image
-			// Code for applying changes goes here...
-			updatePixelImageWithSelectedColors();
-			updateColorsPanel();
-		});
-		return applyChangesButton;
-	}
-
 	private static JButton createSaveChangesButton() {
 		JButton saveChangesButton = new JButton("Save Changes");
 		saveChangesButton.addActionListener(e -> {
@@ -355,26 +299,6 @@ public class ChangePixelColorsGUI extends JFrame {
 		return saveChangesButton;
 	}
 
-	private static void updatePixelImageWithSelectedColors() {
-
-		int width = currentImage.getWidth();
-		int height = currentImage.getHeight();
-
-		int k = 0;
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				int colorIndex = colorIndexList.get(k++);
-				Color color = newColorsList.get(colorIndex);
-				int colorRGB = color.getRGB();
-				currentImage.setRGB(x, y, colorRGB);
-				updatePixelColor(x, y, color);
-			}
-		}
-
-//		displayPixelImage(currentImage);
-
-	}
-
 	private static void displayPixelImage(BufferedImage image) {
 		// Scale the image to the desired width and height
 		currentImage = image;
@@ -404,23 +328,6 @@ public class ChangePixelColorsGUI extends JFrame {
 
 		// Set the frame to be visible
 		pixelImageFrame.setVisible(true);
-	}
-
-	private static void updatePixelColor(int x, int y, Color newColor) {
-		// Check if the image is valid and within the bounds
-		if (currentImage == null || x < 0 || x >= currentImage.getWidth() || y < 0 || y >= currentImage.getHeight()) {
-			return;
-		}
-
-		// Update the pixel color
-		currentImage.setRGB(x, y, newColor.getRGB());
-
-		// Update the displayed image
-		Image newScaledImage = currentImage.getScaledInstance(currentImage.getWidth() * pixelImageScalar,
-				currentImage.getHeight() * pixelImageScalar, Image.SCALE_DEFAULT);
-		JLabel label = (JLabel) pixelImageFrame.getContentPane();
-		label.setIcon(new ImageIcon(newScaledImage));
-		pixelImageFrame.pack();
 	}
 
 	private static void updatePixelColors() {
