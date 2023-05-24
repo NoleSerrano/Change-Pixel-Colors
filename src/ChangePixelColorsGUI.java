@@ -187,12 +187,14 @@ public class ChangePixelColorsGUI extends JFrame {
 			JPanel cell = new JPanel();
 			Color color = existingColors.get(i);
 			cell.setBackground(color);
-			cell.setBorder(BorderFactory.createLineBorder(Color.GRAY, borderWidth));
 
 			int k = i;
 
 			if (i == 0) {
 				currentSelectedPanelCell = cell;
+				cell.setBorder(BorderFactory.createLineBorder(Color.MAGENTA, borderWidth));
+			} else {
+				cell.setBorder(BorderFactory.createLineBorder(Color.GRAY, borderWidth));
 			}
 
 			// Add a MouseListener to handle color selection
@@ -312,12 +314,9 @@ public class ChangePixelColorsGUI extends JFrame {
 		scaledImage = image.getScaledInstance(image.getWidth() * pixelImageScalar, image.getHeight() * pixelImageScalar,
 				Image.SCALE_DEFAULT);
 
-		if (pixelImageFrame != null) {
-			pixelImageFrame.dispose();
-		}
 		// Create a new JFrame to display the image
 		pixelImageFrame = new JFrame("First Image");
-		pixelImageFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		pixelImageFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// Create a JLabel and set it as the content pane of the JFrame
 		JLabel label = new JLabel(new ImageIcon(scaledImage));
