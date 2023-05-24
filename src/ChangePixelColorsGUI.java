@@ -1,8 +1,11 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -16,12 +19,16 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.colorchooser.ColorSelectionModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public class ChangePixelColorsGUI extends JFrame {
 	/**
@@ -46,6 +53,8 @@ public class ChangePixelColorsGUI extends JFrame {
 	private static String imagePrefixName;
 	private static String outputFolderPath;
 	private static String inputFolderPath;
+	private static int screenWidth;
+	private static int screenHeight;
 	private static List<JPanel> colorCells = new ArrayList<>();
 
 	/**
@@ -68,7 +77,7 @@ public class ChangePixelColorsGUI extends JFrame {
 			System.out.println("Invalid input folder path");
 			return;
 		}
-		
+
 		// Retrieve the PNG files from the input folder
 		File[] files = folder.listFiles((dir, name) -> name.endsWith(".png"));
 		if (files == null) {
@@ -83,6 +92,11 @@ public class ChangePixelColorsGUI extends JFrame {
 			String baseImageName = fileName.substring(0, fileName.lastIndexOf('.'));
 			baseImageNames.add(baseImageName);
 		}
+
+		// Calculate the screen dimensions
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		screenWidth = screenSize.width;
+		screenHeight = screenSize.height;
 
 		colorIndexList = new ArrayList<>();
 		existingColors = new ArrayList<>();
@@ -114,31 +128,41 @@ public class ChangePixelColorsGUI extends JFrame {
 		}
 
 		// Create a JFrame to hold the panels
-		JFrame frame = new JFrame("Color Selection");
-		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		frame.setLayout(new GridLayout(2, 1));
+		JFrame colorSelectionFrame = new JFrame("Color Selection");
+		colorSelectionFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		colorSelectionFrame.setLayout(new GridLayout(2, 1));
 
 		// create the panels
 		colorPanel = createColorPanel();
 		selectionPanel = createSelectionPanel();
-		JPanel adjustmentPanel = createAdjustmentPanel();
 		JButton applyChangesButton = createApplyChangesButton();
 		JButton saveChangesButton = createSaveChangesButton();
 
 		// Add the panels to the frame
-		frame.add(colorPanel);
-		frame.add(selectionPanel);
-		frame.add(adjustmentPanel);
-		frame.add(applyChangesButton);
-		frame.add(saveChangesButton);
+		colorSelectionFrame.add(colorPanel);
+		colorSelectionFrame.add(selectionPanel);
+		colorSelectionFrame.add(applyChangesButton);
+		colorSelectionFrame.add(saveChangesButton);
+
+		createColorPicker();
 
 		BufferedImage firstImage = ImageIO
 				.read(new File(inputFolderPath + File.separator + baseImageNames.get(0) + ".png"));
 		displayPixelImage(firstImage);
 
 		// Pack and display the frame
-		frame.pack();
-		frame.setVisible(true);
+		colorSelectionFrame.pack();
+		colorSelectionFrame.setSize(600, 200);
+
+		// Calculate the frame position for bottom placement
+		int frameWidth = colorSelectionFrame.getWidth();
+		int frameHeight = colorSelectionFrame.getHeight();
+		int frameX = (screenWidth - frameWidth) / 2; // Center horizontally
+		int frameY = screenHeight - frameHeight - 100;
+
+		colorSelectionFrame.setLocation(frameX, frameY);
+
+		colorSelectionFrame.setVisible(true);
 	}
 
 	/**
@@ -212,6 +236,11 @@ public class ChangePixelColorsGUI extends JFrame {
 			cell.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
 			int k = i;
+			
+			if (i == 0)
+			{
+				currentSelectedPanelCell = cell;
+			}
 
 			// Add a MouseListener to handle color selection
 			cell.addMouseListener(new MouseAdapter() {
@@ -231,6 +260,41 @@ public class ChangePixelColorsGUI extends JFrame {
 		}
 
 		return selectionPanel;
+	}
+
+	private static void createColorPicker() {
+		JFrame frame = new JFrame("JColorChooser Popup");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(600, 400);
+		frame.setLocationRelativeTo(null); // Center the frame on the screen
+		Container contentPane = frame.getContentPane();
+
+		final JLabel label = new JLabel("I Love Swing", JLabel.CENTER);
+		label.setFont(new Font("Serif", Font.BOLD | Font.ITALIC, 48));
+		contentPane.add(label, BorderLayout.SOUTH);
+
+		final JColorChooser colorChooser = new JColorChooser(label.getBackground());
+		colorChooser.setBorder(BorderFactory.createTitledBorder("Pick Foreground Color"));
+
+		ColorSelectionModel model = colorChooser.getSelectionModel();
+		ChangeListener changeListener = new ChangeListener() {
+			public void stateChanged(ChangeEvent changeEvent) {
+				Color updatedColor = colorChooser.getColor();
+				float[] hsbValues = Color.RGBtoHSB(updatedColor.getRed(), updatedColor.getGreen(),
+						updatedColor.getBlue(), null);
+				label.setForeground(Color.getHSBColor(hsbValues[0], hsbValues[1], hsbValues[2]));
+
+				// listener
+				selectedColor = updatedColor;
+				// Update the selection panel with the selected color
+				updateSelectionPanel(updatedColor);
+			}
+		};
+		model.addChangeListener(changeListener);
+		contentPane.add(colorChooser, BorderLayout.CENTER);
+
+		frame.pack();
+		frame.setVisible(true);
 	}
 
 	private static JPanel createAdjustmentPanel() {
@@ -418,8 +482,16 @@ public class ChangePixelColorsGUI extends JFrame {
 		JLabel label = new JLabel(new ImageIcon(scaledImage));
 		pixelImageFrame.setContentPane(label);
 
+		// Calculate the frame position for left placement
+		int frameWidth = pixelImageFrame.getWidth();
+	    int frameHeight = pixelImageFrame.getHeight();
+	    int frameX = (screenWidth - frameWidth) / 2; // Center horizontally
+	    int frameY = (screenHeight - frameHeight) / 2; // Center vertically
 		// Pack the frame to accommodate the size of the image
 		pixelImageFrame.pack();
+		
+		pixelImageFrame.setLocation(frameX - 650, frameY - 250);
+
 
 		// Set the frame to be visible
 		pixelImageFrame.setVisible(true);
