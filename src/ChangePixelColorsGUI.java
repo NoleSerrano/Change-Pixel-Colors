@@ -211,6 +211,11 @@ public class ChangePixelColorsGUI extends JFrame {
 				}
 			});
 
+			// Set the background color to transparent when needed
+			if (color.getAlpha() == 0) {
+				cell.setOpaque(false);
+			}
+
 			selectionPanel.add(cell);
 		}
 
