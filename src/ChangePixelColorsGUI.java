@@ -19,6 +19,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -51,6 +52,7 @@ public class ChangePixelColorsGUI extends JFrame {
 	private static String inputFolderPath;
 	private static int screenWidth;
 	private static int screenHeight;
+	private static int initialSelectionCellIndex = 1;
 
 	/**
 	 * Launch the application.
@@ -61,6 +63,7 @@ public class ChangePixelColorsGUI extends JFrame {
 		imagePrefixName = "";
 		outputFolderPath = "output";
 		inputFolderPath = "input";
+		
 
 		File folder = new File(outputFolderPath);
 		if (!folder.exists() || !folder.isDirectory()) {
@@ -190,8 +193,9 @@ public class ChangePixelColorsGUI extends JFrame {
 
 			int k = i;
 
-			if (i == 0) {
+			if (i == initialSelectionCellIndex) {
 				currentSelectedPanelCell = cell;
+				selectedPanelIndex = initialSelectionCellIndex;
 				cell.setBorder(BorderFactory.createLineBorder(Color.MAGENTA, borderWidth));
 			} else {
 				cell.setBorder(BorderFactory.createLineBorder(Color.GRAY, borderWidth));
@@ -206,7 +210,7 @@ public class ChangePixelColorsGUI extends JFrame {
 					selectedPanelIndex = k;
 					currentSelectedPanelCell = cell;
 					currentSelectedPanelCell.setBorder(BorderFactory.createLineBorder(Color.MAGENTA, borderWidth));
-					System.out.println("New color selected: " + color + " at selectedPanelIndex " + selectedPanelIndex);
+//					System.out.println("New color selected: " + color + " at selectedPanelIndex " + selectedPanelIndex);
 
 					// Update the first image with the selected color
 					// Code for updating the image goes here...
@@ -235,8 +239,10 @@ public class ChangePixelColorsGUI extends JFrame {
 		label.setFont(new Font("Serif", Font.BOLD | Font.ITALIC, 48));
 		contentPane.add(label, BorderLayout.SOUTH);
 
+		
 		final JColorChooser colorChooser = new JColorChooser(label.getBackground());
 		colorChooser.setBorder(BorderFactory.createTitledBorder("Pick Foreground Color"));
+		
 
 		ColorSelectionModel model = colorChooser.getSelectionModel();
 		ChangeListener changeListener = new ChangeListener() {
@@ -254,6 +260,8 @@ public class ChangePixelColorsGUI extends JFrame {
 			}
 		};
 		model.addChangeListener(changeListener);
+//		JPanel empty = new JPanel();
+//		colorChooser.setPreviewPanel(empty);
 		contentPane.add(colorChooser, BorderLayout.CENTER);
 
 		frame.pack();
