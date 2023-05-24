@@ -181,13 +181,13 @@ public class ChangePixelColorsGUI extends JFrame {
 
 	private static JPanel createSelectionPanel() {
 		JPanel selectionPanel = new JPanel(new GridLayout(1, existingColors.size()));
-
+		int borderWidth = 2;
 		// Create a cell for each color
 		for (int i = 0; i < existingColors.size(); i++) {
 			JPanel cell = new JPanel();
 			Color color = existingColors.get(i);
 			cell.setBackground(color);
-			cell.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+			cell.setBorder(BorderFactory.createLineBorder(Color.GRAY, borderWidth));
 
 			int k = i;
 
@@ -199,9 +199,11 @@ public class ChangePixelColorsGUI extends JFrame {
 			cell.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
+					currentSelectedPanelCell.setBorder(BorderFactory.createLineBorder(Color.GRAY, borderWidth));
 					selectedColor = color;
 					selectedPanelIndex = k;
 					currentSelectedPanelCell = cell;
+					currentSelectedPanelCell.setBorder(BorderFactory.createLineBorder(Color.MAGENTA, borderWidth));
 					System.out.println("New color selected: " + color + " at selectedPanelIndex " + selectedPanelIndex);
 
 					// Update the first image with the selected color
