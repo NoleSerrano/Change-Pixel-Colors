@@ -37,7 +37,7 @@ public class ChangePixelColorsGUI extends JFrame {
 	private static JPanel currentSelectedPanelCell;
 	private static JPanel colorPanel;
 	private static List<Color> newColorsList = new ArrayList<>();
-	private static String[] baseImageNames;
+	private static List<String> baseImageNames = new ArrayList<>();
 	private static List<Integer> colorIndexList;
 	private static int pixelImageScalar = 20;
 	private static BufferedImage currentImage;
@@ -45,8 +45,8 @@ public class ChangePixelColorsGUI extends JFrame {
 	private static JFrame pixelImageFrame;
 	private static String imagePrefixName;
 	private static String outputFolderPath;
+	private static String inputFolderPath;
 	private static List<JPanel> colorCells = new ArrayList<>();
-
 
 	/**
 	 * Launch the application.
@@ -56,10 +56,16 @@ public class ChangePixelColorsGUI extends JFrame {
 	public static void main(String[] args) throws IOException {
 		imagePrefixName = "bb_";
 		outputFolderPath = "output";
-		
+		inputFolderPath = "input";
+
 		File folder = new File(outputFolderPath);
 		if (!folder.exists() || !folder.isDirectory()) {
-			System.out.println("Invalid folder path");
+			System.out.println("Invalid output folder path");
+			return;
+		}
+		folder = new File(inputFolderPath);
+		if (!folder.exists() || !folder.isDirectory()) {
+			System.out.println("Invalid input folder path");
 			return;
 		}
 		if (imagePrefixName.length() == 0) {
@@ -67,14 +73,28 @@ public class ChangePixelColorsGUI extends JFrame {
 			return;
 		}
 
-		baseImageNames = new String[] { "move_left", "move_right", "move_up", "move_down" };
+		// Retrieve the PNG files from the input folder
+		File[] files = folder.listFiles((dir, name) -> name.endsWith(".png"));
+		if (files == null) {
+			System.out.println("No PNG files found in the input folder");
+			return;
+		}
+
+		// Extract the base image names from the PNG file names
+		for (File file : files) {
+			String fileName = file.getName();
+			// Remove the file extension to get the base image name
+			String baseImageName = fileName.substring(0, fileName.lastIndexOf('.'));
+			baseImageNames.add(baseImageName);
+		}
+
 		colorIndexList = new ArrayList<>();
 		existingColors = new ArrayList<>();
 
 		// Process all images and extract color values
 		for (String baseImageName : baseImageNames) {
 
-			BufferedImage image = ImageIO.read(new File(baseImageName + ".png"));
+			BufferedImage image = ImageIO.read(new File(inputFolderPath + File.separator + baseImageName + ".png"));
 			int width = image.getWidth();
 			int height = image.getHeight();
 
@@ -116,7 +136,8 @@ public class ChangePixelColorsGUI extends JFrame {
 		frame.add(applyChangesButton);
 		frame.add(saveChangesButton);
 
-		BufferedImage firstImage = ImageIO.read(new File(baseImageNames[0] + ".png"));
+		BufferedImage firstImage = ImageIO
+				.read(new File(inputFolderPath + File.separator + baseImageNames.get(0) + ".png"));
 		displayPixelImage(firstImage);
 
 		// Pack and display the frame
@@ -146,7 +167,7 @@ public class ChangePixelColorsGUI extends JFrame {
 	}
 
 	// PANELS
-	
+
 	private static JPanel createColorPanel() {
 		JPanel colorPanel = new JPanel(new GridLayout(1, existingColors.size()));
 
@@ -176,11 +197,9 @@ public class ChangePixelColorsGUI extends JFrame {
 
 		return colorPanel;
 	}
-	
-	private static void updateColorsPanel()
-	{
-		for (int i = 0; i < colorCells.size(); i++)
-		{
+
+	private static void updateColorsPanel() {
+		for (int i = 0; i < colorCells.size(); i++) {
 			JPanel colorCell = colorCells.get(i);
 			colorCell.setBackground(newColorsList.get(i));
 		}
@@ -336,7 +355,7 @@ public class ChangePixelColorsGUI extends JFrame {
 
 				BufferedImage image = null;
 				try {
-					image = ImageIO.read(new File(baseImageName + ".png"));
+					image = ImageIO.read(new File(inputFolderPath + File.separator + baseImageName + ".png"));
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -355,7 +374,8 @@ public class ChangePixelColorsGUI extends JFrame {
 				}
 				// Save the combined image
 				try {
-					ImageIO.write(image, "PNG", new File(outputFolderPath + File.separator + imagePrefixName + baseImageName + ".png"));
+					ImageIO.write(image, "PNG",
+							new File(outputFolderPath + File.separator + imagePrefixName + baseImageName + ".png"));
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
