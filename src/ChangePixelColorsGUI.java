@@ -63,7 +63,6 @@ public class ChangePixelColorsGUI extends JFrame {
 		imagePrefixName = "";
 		outputFolderPath = "output";
 		inputFolderPath = "input";
-		
 
 		File folder = new File(outputFolderPath);
 		if (!folder.exists() || !folder.isDirectory()) {
@@ -201,17 +200,14 @@ public class ChangePixelColorsGUI extends JFrame {
 				cell.setBorder(BorderFactory.createLineBorder(Color.GRAY, borderWidth));
 			}
 
-			// Add a MouseListener to handle color selection
 			cell.addMouseListener(new MouseAdapter() {
 				@Override
-				public void mouseClicked(MouseEvent e) {
+				public void mousePressed(MouseEvent e) {
 					currentSelectedPanelCell.setBorder(BorderFactory.createLineBorder(Color.GRAY, borderWidth));
 					selectedColor = color;
 					selectedPanelIndex = k;
 					currentSelectedPanelCell = cell;
 					currentSelectedPanelCell.setBorder(BorderFactory.createLineBorder(Color.MAGENTA, borderWidth));
-//					System.out.println("New color selected: " + color + " at selectedPanelIndex " + selectedPanelIndex);
-
 					// Update the first image with the selected color
 					// Code for updating the image goes here...
 				}
@@ -239,10 +235,8 @@ public class ChangePixelColorsGUI extends JFrame {
 		label.setFont(new Font("Serif", Font.BOLD | Font.ITALIC, 48));
 		contentPane.add(label, BorderLayout.SOUTH);
 
-		
 		final JColorChooser colorChooser = new JColorChooser(label.getBackground());
 		colorChooser.setBorder(BorderFactory.createTitledBorder("Pick Foreground Color"));
-		
 
 		ColorSelectionModel model = colorChooser.getSelectionModel();
 		ChangeListener changeListener = new ChangeListener() {
