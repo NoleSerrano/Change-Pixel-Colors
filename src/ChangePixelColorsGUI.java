@@ -16,14 +16,12 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.colorchooser.ColorSelectionModel;
@@ -237,9 +235,8 @@ public class ChangePixelColorsGUI extends JFrame {
 			cell.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
 			int k = i;
-			
-			if (i == 0)
-			{
+
+			if (i == 0) {
 				currentSelectedPanelCell = cell;
 			}
 
@@ -369,10 +366,12 @@ public class ChangePixelColorsGUI extends JFrame {
 				Color color = newColorsList.get(colorIndex);
 				int colorRGB = color.getRGB();
 				currentImage.setRGB(x, y, colorRGB);
+				updatePixelColor(x, y, color);
 			}
 		}
 
-		displayPixelImage(currentImage);
+//		displayPixelImage(currentImage);
+		
 	}
 
 	private static void displayPixelImage(BufferedImage image) {
@@ -394,18 +393,35 @@ public class ChangePixelColorsGUI extends JFrame {
 
 		// Calculate the frame position for left placement
 		int frameWidth = pixelImageFrame.getWidth();
-	    int frameHeight = pixelImageFrame.getHeight();
-	    int frameX = (screenWidth - frameWidth) / 2; // Center horizontally
-	    int frameY = (screenHeight - frameHeight) / 2; // Center vertically
+		int frameHeight = pixelImageFrame.getHeight();
+		int frameX = (screenWidth - frameWidth) / 2; // Center horizontally
+		int frameY = (screenHeight - frameHeight) / 2; // Center vertically
 		// Pack the frame to accommodate the size of the image
 		pixelImageFrame.pack();
-		
-		pixelImageFrame.setLocation(frameX - 650, frameY - 250);
 
+		pixelImageFrame.setLocation(frameX - 650, frameY - 250);
 
 		// Set the frame to be visible
 		pixelImageFrame.setVisible(true);
 	}
+
+	private static void updatePixelColor(int x, int y, Color newColor) {
+		// Check if the image is valid and within the bounds
+		if (currentImage == null || x < 0 || x >= currentImage.getWidth() || y < 0 || y >= currentImage.getHeight()) {
+			return;
+		}
+
+		// Update the pixel color
+		currentImage.setRGB(x, y, newColor.getRGB());
+
+		// Update the displayed image
+		Image newScaledImage = currentImage.getScaledInstance(currentImage.getWidth() * pixelImageScalar,
+				currentImage.getHeight() * pixelImageScalar, Image.SCALE_DEFAULT);
+		JLabel label = (JLabel) pixelImageFrame.getContentPane();
+		label.setIcon(new ImageIcon(newScaledImage));
+		pixelImageFrame.pack();
+	}
+	
 
 	public static int getColorIndex(Color color, List<Color> existingColors) {
 		int colorDifferenceThreshold = 5;
