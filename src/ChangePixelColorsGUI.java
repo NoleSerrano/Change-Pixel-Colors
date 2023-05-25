@@ -274,6 +274,7 @@ public class ChangePixelColorsGUI extends JFrame {
 			// Apply the selected color changes to the first image
 			// Code for applying changes goes here...
 			// Process all images and extract color values
+			int k = 0;
 			for (String baseImageName : baseImageNames) {
 
 				BufferedImage image = null;
@@ -286,7 +287,7 @@ public class ChangePixelColorsGUI extends JFrame {
 				int width = image.getWidth();
 				int height = image.getHeight();
 
-				int k = 0;
+				
 				for (int y = 0; y < height; y++) {
 					for (int x = 0; x < width; x++) {
 						int colorIndex = colorIndexList.get(k++);
